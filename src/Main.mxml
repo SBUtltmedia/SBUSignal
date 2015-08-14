@@ -4,40 +4,53 @@
 
     <mx:Script><![CDATA[
         import mx.controls.Alert;
-        import com.adobe.sync.events.SyncSwfEvent;
-var myAlertState =false;
 
-        function changeAlertState(){
+        import com.adobe.sync.events.SyncSwfEvent;
+
+        var myAlertState:Boolean = false;
+        var count:Number = 0;
+
+        function changeAlertState():Boolean {
             trace(myAlertState);
-            myAlertState= !myAlertState;
-            syncConnector.dispatchSyncMessage("alert",myAlertState, false,true);
+            myAlertState = !myAlertState;
+            syncConnector.dispatchSyncMessage("alert", myAlertState, false, true);
             return myAlertState;
 
         }
 
-        private function onCreationComplete():void
-        {
 
+        private function flashSignal():void {
+            changeAlertState();
+
+            if (myAlertState)
+                signal1Image.source = signal2Image.source;
+
+            else
+                signal1Image.source = signal3Image.source;
+        }
+
+        private function onCreationComplete():void {
 
         }
 
 
-        private function caughtUp(p_evt:SyncSwfEvent):void
-        {
+        private function caughtUp(p_evt:SyncSwfEvent):void {
 
         }
-        private function syncMessageReceived(p_evt:SyncSwfEvent):void
-        {
 
-            if(p_evt.data.msgNm =="alert")
-            properties_ta.text= p_evt.data.msgVal;
+        private function syncMessageReceived(p_evt:SyncSwfEvent):void {
+
+            if (p_evt.data.msgNm == "alert")
+                signal1Image.visible = p_evt.data.msgVal;
         }
-
-
         ]]></mx:Script>
 
-    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="properties_ta.text = changeAlertState()"/>
-    <mx:TextArea width="100%" height="40%" id="properties_ta"/>
+    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="setInterval(flashSignal, 150);"></mx:Button>
+    <!--<mx:TextArea width="100%" height="40%" id="properties_ta"/>-->
+    <mx:Image id="signal1Image" source="@Embed(source='../img/signal1.svg')"/>
+    <mx:Image id="signal2Image" source="@Embed(source='../img/signal2.svg')" visible="false"/>
+    <mx:Image id="signal3Image" source="@Embed(source='../img/signal1.svg')" visible="false"/>
+
 
     <ns1:SyncConnector id = "syncConnector" syncMessageReceived = "syncMessageReceived(event)" caughtUp="caughtUp(event)"/>
     <!--<ns1:ConnectionEmulator id = "connectionEmulator" bSyncConnector="{syncConnector}"/>-->
