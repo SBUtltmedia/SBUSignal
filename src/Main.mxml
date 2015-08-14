@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="horizontal" horizontalGap="10" xmlns:ns1="com.adobe.sync.components.*"
+                creationComplete="onCreationComplete()" backgroundColor="0xFFFFFF" >
+
+    <mx:Script><![CDATA[
+        import mx.controls.Alert;
+        import com.adobe.sync.events.SyncSwfEvent;
+var myAlertState =false;
+
+        function changeAlertState(){
+            trace(myAlertState);
+            myAlertState= !myAlertState;
+            syncConnector.dispatchSyncMessage("alert",myAlertState, false,true);
+            return myAlertState;
+
+        }
+
+        private function onCreationComplete():void
+        {
+
+
+        }
+
+
+        private function caughtUp(p_evt:SyncSwfEvent):void
+        {
+
+        }
+        private function syncMessageReceived(p_evt:SyncSwfEvent):void
+        {
+
+            if(p_evt.data.msgNm =="alert")
+            properties_ta.text= p_evt.data.msgVal;
+        }
+
+
+        ]]></mx:Script>
+
+    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="properties_ta.text = changeAlertState()"/>
+    <mx:TextArea width="100%" height="40%" id="properties_ta"/>
+
+    <ns1:SyncConnector id = "syncConnector" syncMessageReceived = "syncMessageReceived(event)" caughtUp="caughtUp(event)"/>
+    <!--<ns1:ConnectionEmulator id = "connectionEmulator" bSyncConnector="{syncConnector}"/>-->
+</mx:Application>
