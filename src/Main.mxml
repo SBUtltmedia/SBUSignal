@@ -11,6 +11,7 @@
         private var myAlertState:Boolean = false;
         private var count:Number = 0;
         private var intervalID:uint;
+        private var timeSent:Date = new Date();
 
         private function changeAlertState():Boolean {
             trace(myAlertState);
@@ -20,14 +21,12 @@
 
         }
 
-        //Flashes the SBU Signal and stops after 50 loops
+        //Flashes the SBU Signal and stops after 40 loops
         private function flashSignal():void {
             changeAlertState();
-            signal1Image.setVisible(!myAlertState);
-            signal2Image.setVisible(myAlertState);
 
-            syncConnector.dispatchSyncMessage("img1Vis", signal1Image.visible, false, true);
-            syncConnector.dispatchSyncMessage("img2Vis", signal2Image.visible, false, true);
+            syncConnector.dispatchSyncMessage("img1Vis", !myAlertState, false, true);
+            syncConnector.dispatchSyncMessage("img2Vis", myAlertState, false, true);
             count++;
 
             if (count == 40) {
@@ -36,6 +35,8 @@
 
                 count = 0;
             }
+
+            syncConnector.dispatchSyncMessage("date", timeSent.toString(), false, true);
         }
 
         private function onCreationComplete():void {
@@ -54,20 +55,25 @@
             if(p_evt.data.msgNm == "img2Vis")
                 signal2Image.setVisible(p_evt.data.msgVal);
 
-//            if(p_evt.data.msgNm == "date")
-//                properties_ta.text = p_evt.data.msgVal;
+            if(p_evt.data.msgNm == "date")
+                properties_ta.text = p_evt.data.msgVal;
+
+            if(p_evt.data.msgNm == "interval")
+                intervalID = p_evt.data.msgVal;
 
         }
         ]]></mx:Script>
 
-    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="if(count == 0) {intervalID = setInterval(flashSignal, 85);
-                                                                               syncConnector.dispatchSyncMessage('date', Date.UTC, false, true);}
+    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="if(count == 0) { properties_ta.text += syncConnector.userID + ': ' + timeSent.toString() + '\n';
+                                                                                intervalID = setInterval(flashSignal, 300);
+                                                                                syncConnector.dispatchSyncMessage('interval', intervalID,false,true);}
 
-                                                                               else if(count > 0){clearInterval(intervalID);
+
+                                                                               else {clearInterval(intervalID);
                                                                                count = 0;
                                                                                signal1Image.setVisible(true); signal2Image.setVisible(false);
                                                                                };"></mx:Button>
-    <!--<mx:TextArea width="5%" height="5%" id="properties_ta" x ="0" y ="40"/>-->
+    <mx:TextArea width="15%" height="5%" id="properties_ta" x ="250" y ="0"/>
     <mx:Image id="signal1Image" source="@Embed(source='../img/signal1.svg')" x="150" y="0" visible="true"/>
     <mx:Image id="signal2Image" source="@Embed(source='../img/signal2.svg')" x="150" y="0" visible="false"/>
 
