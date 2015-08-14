@@ -7,10 +7,11 @@
 
         import com.adobe.sync.events.SyncSwfEvent;
 
-        var myAlertState:Boolean = false;
-        var count:Number = 0;
+        private var myAlertState:Boolean = false;
+        private var count:Number = 0;
+        private var intervalID:uint;
 
-        function changeAlertState():Boolean {
+        private function changeAlertState():Boolean {
             trace(myAlertState);
             myAlertState = !myAlertState;
             syncConnector.dispatchSyncMessage("alert", myAlertState, false, true);
@@ -18,7 +19,7 @@
 
         }
 
-
+        //Flashes the SBU Signal and stops after 50 loops
         private function flashSignal():void {
             changeAlertState();
 
@@ -27,6 +28,13 @@
 
             else
                 signal1Image.source = signal3Image.source;
+
+            count++;
+
+            if (count == 40) {
+                clearInterval(intervalID);
+                count = 0;
+            }
         }
 
         private function onCreationComplete():void {
@@ -41,11 +49,11 @@
         private function syncMessageReceived(p_evt:SyncSwfEvent):void {
 
             if (p_evt.data.msgNm == "alert")
-                signal1Image.visible = p_evt.data.msgVal;
+                //signal1Image.visible = p_evt.data.msgVal;
         }
         ]]></mx:Script>
 
-    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="setInterval(flashSignal, 150);"></mx:Button>
+    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="intervalID = setInterval(flashSignal, 85);"></mx:Button>
     <!--<mx:TextArea width="100%" height="40%" id="properties_ta"/>-->
     <mx:Image id="signal1Image" source="@Embed(source='../img/signal1.svg')"/>
     <mx:Image id="signal2Image" source="@Embed(source='../img/signal2.svg')" visible="false"/>

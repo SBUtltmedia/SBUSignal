@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="SBUSignal">
+    <configurations>
+      <configuration name="SBUSignal" main-class="Main" output-file="Main.swf" output-folder="$MODULE_DIR$/out/production/SBUSignal" use-html-wrapper="true" wrapper-template-path="$MODULE_DIR$/html-template">
+        <dependencies target-player="16.0">
+          <entries>
+            <entry library-id="12eb8210-a033-47c8-b3ec-cabf7d8cf5df">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="cf332743-4302-41ed-abdf-b3345aaa01fc">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="96f0f70e-da1a-4f46-a53e-a49e0b06a370">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="Apache Flex SDK" />
+        </dependencies>
+        <compiler-options />
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Apache Flex SDK" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="12eb8210-a033-47c8-b3ec-cabf7d8cf5df" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/ConnectionEmulator.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="cf332743-4302-41ed-abdf-b3345aaa01fc" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/ServicesEmulator.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="96f0f70e-da1a-4f46-a53e-a49e0b06a370" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../libs/SyncConnector.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>
