@@ -48,8 +48,6 @@
 
         private function syncMessageReceived(p_evt:SyncSwfEvent):void {
 
-            if (p_evt.data.msgNm == "alert")
-                //signal1Image.visible = p_evt.data.msgVal;
         }
         ]]></mx:Script>
 
