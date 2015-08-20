@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" horizontalGap="10" xmlns:ns1="com.adobe.sync.components.*"
-                creationComplete="onCreationComplete()" backgroundColor="0xFFFFFF" >
+                creationComplete="onCreationComplete()" backgroundColor="0xFFFFFF" width="500" height="150">
 
     <mx:Script><![CDATA[
         import mx.controls.Alert;
@@ -12,6 +12,7 @@
         private var count:Number = 0;
         private var intervalID:uint;
         private var timeSent:Date = new Date();
+        private var clickCount:Number = 0;
 
         private function changeAlertState():Boolean {
             trace(myAlertState);
@@ -21,7 +22,7 @@
 
         }
 
-        //Flashes the SBU Signal and stops after 40 loops
+        //Flashes the SBU Signal and stops after 20 loops
         private function flashSignal():void {
             changeAlertState();
 
@@ -29,14 +30,19 @@
             syncConnector.dispatchSyncMessage("img2Vis", myAlertState, false, true);
             count++;
 
-            if (count == 40) {
+            if (count == 20) {
 
                 clearInterval(intervalID);
 
                 count = 0;
+                syncConnector.dispatchSyncMessage('clearInt', intervalID, false, true);
+                syncConnector.dispatchSyncMessage('countChanged', count,false,true);
             }
 
             syncConnector.dispatchSyncMessage("date", timeSent.toString(), false, true);
+            countdbg.text = count.toString();
+            syncConnector.dispatchSyncMessage('countChanged', count,false,true);
+
         }
 
         private function onCreationComplete():void {
@@ -49,33 +55,80 @@
         }
 
         private function syncMessageReceived(p_evt:SyncSwfEvent):void {
-            if(p_evt.data.msgNm == "img1Vis")
+            if (p_evt.data.msgNm == "img1Vis")
+                signal0Image.setVisible(p_evt.data.msgVal);
+
+            if (p_evt.data.msgNm == "img2Vis")
                 signal1Image.setVisible(p_evt.data.msgVal);
 
-            if(p_evt.data.msgNm == "img2Vis")
-                signal2Image.setVisible(p_evt.data.msgVal);
-
-            if(p_evt.data.msgNm == "date")
+            if (p_evt.data.msgNm == "date")
                 properties_ta.text = p_evt.data.msgVal;
 
-            if(p_evt.data.msgNm == "interval")
+            if (p_evt.data.msgNm == "interval") {
+                //This is the NEW intervalID as set from the syncConnector
                 intervalID = p_evt.data.msgVal;
+                intdbg.text = intervalID.toString();
+               // SBU_btn.enabled = false;
+            }
+
+            if(p_evt.data.msgNm == "countChanged")
+            {
+                count = p_evt.data.msgVal;
+                countdbg.text = count.toString();
+            }
+
+            if(p_evt.data.msgNm == "clickCount")
+            {
+                if(clickCount != p_evt.data.msgVal)
+                clickCount = p_evt.data.msgVal;
+            }
+
+
+
+            if (p_evt.data.msgNm == "clearInt") {
+                //SBU_btn.enabled = true;
+                intervalID = p_evt.data.msgVal;
+                intdbg.text = intervalID.toString();
+                clearInterval(intervalID);
+                signal0Image.setVisible(true);
+                signal1Image.setVisible(false);
+            }
+
 
         }
         ]]></mx:Script>
 
-    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="if(count == 0) { properties_ta.text += syncConnector.userID + ': ' + timeSent.toString() + '\n';
+    <mx:Button label="Send the SBU Signal" id="SBU_btn" click="if(count == 0) {
+                                                                                clickCount++;
+                                                                                syncConnector.dispatchSyncMessage('click', clickCount,false,true);
+                                                                                if(clickCount % 2 != 0)
+                                                                                {
+                                                                                properties_ta.text += 'Signal sent by: ' + syncConnector.userID + ': ' + timeSent.toTimeString() + '\n';
+                                                                                syncConnector.dispatchSyncMessage('countChanged', count,false,true);
                                                                                 intervalID = setInterval(flashSignal, 300);
-                                                                                syncConnector.dispatchSyncMessage('interval', intervalID,false,true);}
+
+                                                                                syncConnector.dispatchSyncMessage('interval', intervalID,false,true);
+                                                                                syncConnector.dispatchSyncMessage('countChanged', count,false,true);
+                                                                                }
+
+                                                                              }
 
 
-                                                                               else {clearInterval(intervalID);
+                                                                              else
+                                                                              {
+                                                                               clearInterval(intervalID);
                                                                                count = 0;
-                                                                               signal1Image.setVisible(true); signal2Image.setVisible(false);
-                                                                               };"></mx:Button>
-    <mx:TextArea width="15%" height="5%" id="properties_ta" x ="250" y ="0"/>
-    <mx:Image id="signal1Image" source="@Embed(source='../img/signal1.svg')" x="150" y="0" visible="true"/>
-    <mx:Image id="signal2Image" source="@Embed(source='../img/signal2.svg')" x="150" y="0" visible="false"/>
+                                                                               countdbg.text = count.toString();
+                                                                               syncConnector.dispatchSyncMessage('clearInt', intervalID, false, true);
+
+                                                                               syncConnector.dispatchSyncMessage('countChanged', count,false,true);
+                                                                               };
+                                                                               "></mx:Button>
+    <mx:TextArea width="50%" height="5%" id="properties_ta" x ="0" y ="95"/>
+    <mx:Image id="signal0Image" source="@Embed(source='../img/signal1.svg')" x="150" y="0" visible="true"/>
+    <mx:Image id="signal1Image" source="@Embed(source='../img/signal2.svg')" x="150" y="0" visible="false"/>
+    <mx:Text id ="countdbg" x ="0" y="140" text="0"></mx:Text>
+    <mx:Text id ="intdbg" x ="25" y="140" text="0"></mx:Text>
 
 
     <ns1:SyncConnector id = "syncConnector" syncMessageReceived = "syncMessageReceived(event)" caughtUp="caughtUp(event)"/>
